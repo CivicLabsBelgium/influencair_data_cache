@@ -58,16 +58,21 @@ class Luftdaten {
             if (fs.existsSync(cityForLocationPath)) {
                 fs.readFile(cityForLocationPath, (err, data) => {
                     if (err) throw err
-                    this.cityForLocation = new Map(JSON.parse(data))
-                    console.log('loaded cityForLocation')
+                    try {
+                        const json = JSON.parse(data)
+                        this.cityForLocation = new Map(json)
+                        console.log('loaded cityForLocation')
+                    } catch (error) {
+                        console.error(error)
+                    }
                 })
             } else {
                 (
                     console.log('Could not find cityForLocation.json', cityForLocationPath)
                 )
             }
-        } catch (err) {
-            console.error(err)
+        } catch (error) {
+            console.error(error)
         }
     }
     getCurrentData () {

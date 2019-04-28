@@ -26,4 +26,4 @@ yarn-error.log*
 # global config
 src/config.js
 
-static/*
+static/*/*
