@@ -12,13 +12,10 @@ https://data.influencair.be/now/BE/data.json
 ## ranking of current (24h) online sensors of Luftdaten
 
 ### World
-https://data.influencair.be/worldRanking.json
+https://data.influencair.be/ranking/worldRanking.json
 
 ### Country
-https://data.influencair.be/countryRanking.json
+https://data.influencair.be/ranking/countryRanking.json
 
 ### City
-https://data.influencair.be/cityRanking.json
-
-## Historical data
-_In development_
+https://data.influencair.be/ranking/cityRanking.json
