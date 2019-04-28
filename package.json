@@ -1,0 +1,49 @@
+{
+  "name": "irceline_live_cache",
+  "version": "1.0.0",
+  "description": "caching the irceline airquality data in a more consumable way for the influencair map",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node src/index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/CivicLabsBelgium/irceline_live_cache.git"
+  },
+  "keywords": [
+    "ireceline",
+    "air-q",
+    "data"
+  ],
+  "author": "toon nelissen (toon@appsaloon.be)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/CivicLabsBelgium/irceline_live_cache/issues"
+  },
+  "homepage": "https://github.com/CivicLabsBelgium/irceline_live_cache#readme",
+  "dependencies": {
+    "express": "^4.16.4",
+    "geocoder-geonames": "^0.1.2",
+    "got": "^9.6.0",
+    "serve-index": "^1.9.1",
+    "serve-static": "^1.13.2"
+  },
+  "eslintConfig": {
+    "extends": "standard",
+    "rules": {
+      "indent": [
+        "error",
+        4
+      ]
+    }
+  },
+  "devDependencies": {
+    "eslint": "^5.14.1",
+    "eslint-config-standard": "^12.0.0",
+    "eslint-plugin-import": "^2.16.0",
+    "eslint-plugin-node": "^8.0.1",
+    "eslint-plugin-promise": "^4.0.1",
+    "eslint-plugin-standard": "^4.0.0"
+  }
+}
