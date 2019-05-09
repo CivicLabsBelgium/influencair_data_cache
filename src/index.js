@@ -3,18 +3,19 @@ const path = require('path')
 const serveStatic = require('serve-static')
 const serveIndex = require('serve-index')
 const dataCruncher = require('./dataCruncher')
+const sanitizeRequest = require('express-sanitize-middleware')
 
 const app = express()
 const port = 8080
 
-// const irceline = new Irceline()
-// new Luftdaten()
-
 dataCruncher()
+
+app.get('/badge/amount/city/:cityname', sanitizeRequest({ params: true, query: true }), require('./cityAmountBadge'))
 
 app.use(serveStatic(path.join(__dirname, '..', 'static'), {
     index: false
 }))
+
 app.use(serveIndex(path.join(__dirname, '..', 'static'), {
     icons: true
 }))
