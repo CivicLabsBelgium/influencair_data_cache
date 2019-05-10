@@ -28,7 +28,6 @@
     "fs-extra": "^7.0.1",
     "geocoder-geonames": "^0.1.2",
     "got": "^9.6.0",
-    "html2png": "^1.1.2",
     "serve-index": "^1.9.1",
     "serve-static": "^1.13.2",
     "text2png": "^2.1.0"
