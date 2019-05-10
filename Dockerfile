@@ -1,7 +1,9 @@
 FROM node:12
 
-# RUN apk add tini --no-cache
-ENTRYPOINT ["/sbin/tini", "--"]
+ENV TINI_VERSION v0.18.0
+ADD https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini /tini
+RUN chmod +x /tini
+ENTRYPOINT ["/tini", "--"]
 
 RUN mkdir -p /server/node_modules && chown -R node:node /server
 WORKDIR /server
