@@ -23,7 +23,6 @@
   },
   "homepage": "https://github.com/CivicLabsBelgium/irceline_live_cache#readme",
   "dependencies": {
-    "canvas": "^2.5.0",
     "express": "^4.16.4",
     "express-sanitize-middleware": "^1.0.3",
     "fs-extra": "^7.0.1",
