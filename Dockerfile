@@ -15,7 +15,7 @@ USER node
 RUN npm i --only=prod
 
 COPY --chown=node:node src/ ./src
-# COPY --chown=node:node static/ ./static/
+COPY --chown=node:node static/ ./static/
 COPY --chown=node:node storage/ ./storage/
 
 CMD ["node", "src/index"]

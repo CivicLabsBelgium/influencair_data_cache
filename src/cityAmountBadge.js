@@ -23,14 +23,19 @@ const getCityRanking = (city) => {
 
 const cityAmountBadge = async (req, res) => {
     if (req.params.cityname) {
+        const text2pngOptions = { padding: 2 }
+        text2pngOptions.color = req.query.color || 'black'
+        text2pngOptions.backgroundColor = req.query.bgColor || 'transparant'
+        const fontSize = req.query.fontSize || 20
+        const font = req.query.font || 'Gill Sans'
+        text2pngOptions.font = `${fontSize}px ${font}`
         const cityName = req.params.cityname.split('.')[0]
         const preText = req.query.pre ? req.query.pre + ' ' : ''
         const postText = req.query.post ? ' ' + req.query.post : ''
         console.log(preText, postText)
         // const filePath = path.join(cityDirectoryPath, cityName + '.png')
         const city = await getCityRanking(cityName)
-        const file = text2png(preText + city.amount + postText, { color: 'black', padding: 2, font: '20px Gill Sans' })
-        // fs.outputFile(filePath, file)
+        const file = text2png(preText + city.amount + postText, text2pngOptions)
         res.send(file)
     } else {
         res.sendStatus(404)

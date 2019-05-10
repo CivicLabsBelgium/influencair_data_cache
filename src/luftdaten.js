@@ -1,5 +1,5 @@
 const got = require('got')
-const fs = require('fs')
+const fs = require('fs-extra')
 const path = require('path')
 const GeocoderGeonames = require('geocoder-geonames')
 
@@ -55,22 +55,15 @@ class Luftdaten {
         const cityForLocationPath = path.join(storageDirectoryPath, 'cityForLocation.json')
 
         try {
-            if (fs.existsSync(cityForLocationPath)) {
-                fs.readFile(cityForLocationPath, (err, data) => {
-                    if (err) throw err
-                    try {
-                        const json = JSON.parse(data)
-                        this.cityForLocation = new Map(json)
-                        console.log('loaded cityForLocation')
-                    } catch (error) {
-                        console.error(error)
-                    }
+            fs.ensureFile(cityForLocationPath, err => {
+                if (err) throw err
+                fs.readJson(cityForLocationPath, (err, json) => {
+                    if (err) console.error(err)
+                    console.log(json)
+                    this.cityForLocation = new Map(json)
+                    console.log('loaded cityForLocation')
                 })
-            } else {
-                (
-                    console.log('Could not find cityForLocation.json', cityForLocationPath)
-                )
-            }
+            })
         } catch (error) {
             console.error(error)
         }
@@ -252,10 +245,7 @@ class Luftdaten {
                     }
                     const countrypath = path.join(staticDirectoryPath, 'now', key)
                     try {
-                        if (!fs.existsSync(countrypath)) {
-                            fs.mkdirSync(countrypath)
-                        }
-                        fs.writeFile(path.join(countrypath, 'data.json'), JSON.stringify(countryDataJSON), (err) => {
+                        fs.outputJson(path.join(countrypath, 'data.json'), countryDataJSON, (err) => {
                             if (err) throw err
                         })
                     } catch (err) {
@@ -275,7 +265,7 @@ class Luftdaten {
                 data: this.data
             }
             try {
-                fs.writeFile(path.join(staticDirectoryPath, 'now', 'data.json'), JSON.stringify(worldDataJSON), (err) => {
+                fs.outputJson(path.join(staticDirectoryPath, 'now', 'data.json'), worldDataJSON, (err) => {
                     if (err) throw err
                 })
             } catch (error) {
@@ -336,7 +326,7 @@ class Luftdaten {
             }
             const cityForLocationPath = path.join(storageDirectoryPath, 'cityForLocation.json')
             try {
-                fs.writeFile(cityForLocationPath, JSON.stringify([...this.cityForLocation]), (err) => {
+                fs.outputJson(cityForLocationPath, [...this.cityForLocation], (err) => {
                     if (err) throw err
                     console.log('The file cityForLocation.json, has been saved! With ' + this.cityForLocation.size + 'records')
                 })
@@ -406,7 +396,7 @@ class Luftdaten {
             data: citiesArray
         }
 
-        fs.writeFile(path.join(staticRankingDirectoryPath, 'cityRanking.json'), JSON.stringify(cityRankingJSON, null, 4), (err) => {
+        fs.outputJson(path.join(staticRankingDirectoryPath, 'cityRanking.json'), cityRankingJSON, { spaces: 4 }, (err) => {
             if (err) throw err
             console.log('The file cityRanking.json, has been saved!')
         })
@@ -422,7 +412,7 @@ class Luftdaten {
             data: countriesArray
         }
 
-        fs.writeFile(path.join(staticRankingDirectoryPath, 'countryRanking.json'), JSON.stringify(countryRankingJSON, null, 4), (err) => {
+        fs.outputJson(path.join(staticRankingDirectoryPath, 'countryRanking.json'), countryRankingJSON, { spaces: 4 }, (err) => {
             if (err) throw err
             console.log('The file countryRanking.json, has been saved!')
         })
@@ -438,7 +428,7 @@ class Luftdaten {
             data: worldArray
         }
 
-        fs.writeFile(path.join(staticRankingDirectoryPath, 'worldRanking.json'), JSON.stringify(worldRankingJSON, null, 4), (err) => {
+        fs.outputJson(path.join(staticRankingDirectoryPath, 'worldRanking.json'), worldRankingJSON, { spaces: 4 }, (err) => {
             if (err) throw err
             console.log('The file worldRanking.json, has been saved!')
         })
