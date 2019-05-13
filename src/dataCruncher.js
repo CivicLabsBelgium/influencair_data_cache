@@ -35,7 +35,9 @@ const getList = [
         dataSaver: [
             luftdaten.createStaticJsonFiles,
             luftdaten.updateCityData,
-            luftdaten.calculateRankings
+            luftdaten.calculateRankings,
+            luftdaten.createSensorsPerCity,
+            luftdaten.createSensorsPerCountry
         ]
     },
     {

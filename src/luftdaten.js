@@ -46,11 +46,8 @@ class Luftdaten {
         this.createStaticJsonFiles = this.createStaticJsonFiles.bind(this)
         this.updateCityData = this.updateCityData.bind(this)
         this.calculateRankings = this.calculateRankings.bind(this)
-
-        // setInterval(() => this.getCurrentData(), 1000 * 60 * 1)
-        // setInterval(() => this.getMeans(), 1000 * 60 * 30)
-        // this.getCurrentData()
-        // this.getMeans()
+        this.createSensorsPerCity = this.createSensorsPerCity.bind(this)
+        this.createSensorsPerCountry = this.createSensorsPerCountry.bind(this)
 
         const cityForLocationPath = path.join(storageDirectoryPath, 'cityForLocation.json')
 
@@ -59,7 +56,6 @@ class Luftdaten {
                 if (err) throw err
                 fs.readJson(cityForLocationPath, (err, json) => {
                     if (err) console.error(err)
-                    console.log(json)
                     this.cityForLocation = new Map(json)
                     console.log('loaded cityForLocation')
                 })
@@ -222,7 +218,6 @@ class Luftdaten {
         this.data = sensorLocations
         console.log('got luftdaten currentData ', new Date())
     }
-
     createStaticJsonFiles () {
         return new Promise((resolve, reject) => {
             const dataPerCountry = this.data.reduce((acc, sensorLocation) => {
@@ -267,6 +262,66 @@ class Luftdaten {
             try {
                 fs.outputJson(path.join(staticDirectoryPath, 'now', 'data.json'), worldDataJSON, (err) => {
                     if (err) throw err
+                })
+            } catch (error) {
+                reject(error)
+            }
+            resolve()
+        })
+    }
+    createSensorsPerCity () {
+        const cityList = {}
+        const cityForLocation = [...this.cityForLocation]
+        return new Promise((resolve, reject) => {
+            for (const sensorLocation of cityForLocation) {
+                const location = sensorLocation[1]
+                cityList[location.city] = cityList[location.city] || []
+                cityList[location.city].push(sensorLocation[0])
+            }
+            const cityListJSON = {
+                name: 'ensorlocationIds per city',
+                description: 'List of sensorlocation id\'s per city',
+                source: 'http://api.luftdaten.info/static/v2/data.json',
+                origin: 'https://data.influencair.be/cityList.json',
+                author: 'Toon Nelissen',
+                // documentation: 'https://documentation.influencair.be',
+                timestamp: (new Date()).toJSON(),
+                data: cityList
+            }
+            try {
+                fs.outputJson(path.join(staticDirectoryPath, 'cityList.json'), cityListJSON, (err) => {
+                    if (err) throw err
+                    console.log('The file cityList.json, has been saved!')
+                })
+            } catch (error) {
+                reject(error)
+            }
+            resolve()
+        })
+    }
+    createSensorsPerCountry () {
+        const countryList = {}
+        const cityForLocation = [...this.cityForLocation]
+        return new Promise((resolve, reject) => {
+            for (const sensorLocation of cityForLocation) {
+                const location = sensorLocation[1]
+                countryList[location.country] = countryList[location.country] || []
+                countryList[location.country].push(sensorLocation[0])
+            }
+            const countryListJSON = {
+                name: 'sensorlocationIds per country',
+                description: 'List of sensorlocation id\'s per country',
+                source: 'http://api.luftdaten.info/static/v2/data.json',
+                origin: 'https://data.influencair.be/countryList.json',
+                author: 'Toon Nelissen',
+                // documentation: 'https://documentation.influencair.be',
+                timestamp: (new Date()).toJSON(),
+                data: countryList
+            }
+            try {
+                fs.outputJson(path.join(staticDirectoryPath, 'countryList.json'), countryListJSON, (err) => {
+                    if (err) throw err
+                    console.log('The file countryList.json, has been saved!')
                 })
             } catch (error) {
                 reject(error)

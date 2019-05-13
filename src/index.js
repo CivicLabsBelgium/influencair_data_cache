@@ -11,6 +11,7 @@ const port = 8080
 dataCruncher()
 
 app.get('/badge/amount/city/:cityname', sanitizeRequest({ params: true, query: true }), require('./cityAmountBadge'))
+app.get('/badge/amount/country/:countryname', sanitizeRequest({ params: true, query: true }), require('./countryAmountBadge'))
 
 app.use(serveStatic(path.join(__dirname, '..', 'static'), {
     index: false
