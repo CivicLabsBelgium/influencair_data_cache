@@ -37,7 +37,8 @@ const getList = [
             luftdaten.updateCityData,
             luftdaten.calculateRankings,
             luftdaten.createSensorsPerCity,
-            luftdaten.createSensorsPerCountry
+            luftdaten.createSensorsPerCountry,
+            luftdaten.updateSensorLocationsData
         ]
     },
     {

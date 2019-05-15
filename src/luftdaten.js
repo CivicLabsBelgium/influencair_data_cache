@@ -48,8 +48,11 @@ class Luftdaten {
         this.calculateRankings = this.calculateRankings.bind(this)
         this.createSensorsPerCity = this.createSensorsPerCity.bind(this)
         this.createSensorsPerCountry = this.createSensorsPerCountry.bind(this)
+        this.updateSensorLocationsData = this.updateSensorLocationsData.bind(this)
 
         const cityForLocationPath = path.join(storageDirectoryPath, 'cityForLocation.json')
+        const sensorLocationsPath = path.join(storageDirectoryPath, 'sensorLocations.json')
+
 
         try {
             fs.ensureFile(cityForLocationPath, err => {
@@ -57,6 +60,14 @@ class Luftdaten {
                 fs.readJson(cityForLocationPath, (err, json) => {
                     if (err) console.error(err)
                     this.cityForLocation = new Map(json)
+                    console.log('loaded cityForLocation')
+                })
+            })
+            fs.ensureFile(sensorLocationsPath, err => {
+                if (err) throw err
+                fs.readJson(sensorLocationsPath, (err, json) => {
+                    if (err) console.error(err)
+                    this.sensorLocations = new Map(json)
                     console.log('loaded cityForLocation')
                 })
             })
@@ -101,14 +112,14 @@ class Luftdaten {
 
                 if (Array.isArray(hourly)) {
                     const hourlyMap = new Map()
-                    hourly.forEach(record => hourlyMap.set(`L-${record.sensor.id}`, record.sensordatavalues))
+                    hourly.forEach(record => hourlyMap.set(record.sensor.id, record.sensordatavalues))
                     this.hourlyMap = hourlyMap
                 } else {
                     console.log('hourly')
                 }
                 if (Array.isArray(daily)) {
                     const dailyMap = new Map()
-                    daily.forEach(record => dailyMap.set(`L-${record.sensor.id}`, record.sensordatavalues))
+                    daily.forEach(record => dailyMap.set(record.sensor.id, record.sensordatavalues))
                     this.dailyMap = dailyMap
                 } else {
                     console.log('daily')
@@ -147,6 +158,8 @@ class Luftdaten {
                 }
             }
 
+            parsedSensorLocation.latitude = station.location.latitude
+            parsedSensorLocation.longitude = station.location.longitude
             // TODO sensor can already be in the sensor list. And some phenomenom are send at a different time
 
             const currentSensor = {
@@ -212,6 +225,10 @@ class Luftdaten {
             parsedSensorLocation.sensors.push(currentSensor)
 
             if (isValid && isNew) sensorLocations.push(parsedSensorLocation)
+
+            const sloc = { ...parsedSensorLocation }
+            delete sloc.sensors
+            this.sensorLocations.set(station.location.id, sloc)
         })
 
         this.dataTimeStamp = new Date()
@@ -270,14 +287,48 @@ class Luftdaten {
         })
     }
     createSensorsPerCity () {
-        const cityList = {}
-        const cityForLocation = [...this.cityForLocation]
+        const cityList = new Map()
+        const sensorLocations = [...this.sensorLocations]
         return new Promise((resolve, reject) => {
-            for (const sensorLocation of cityForLocation) {
+            for (const sensorLocation of sensorLocations) {
                 const location = sensorLocation[1]
-                cityList[location.city] = cityList[location.city] || []
-                cityList[location.city].push(sensorLocation[0])
+                const city = cityList.get(location.city) || {
+                    name: location.city,
+                    tiles: [],
+                    sensorLocations: [],
+                    data: []
+                }
+                city.data.push(sensorLocation[0])
+                city.sensorLocations.push([location.latitude, location.longitude])
+                cityList.set(location.city, city)
             }
+            cityList.forEach((cityObj, key) => {
+                const sensorLocations = cityObj.sensorLocations
+                const startVal = [[-360, 360], [-360, 360]]
+                const minmaxLatlng = sensorLocations.reduce((acc, location) => {
+                    const lat = location[0]
+                    const lng = location[1]
+                    acc[0][0] = lat > acc[0][0] ? lat : acc[0][0]
+                    acc[0][1] = lat < acc[0][1] ? lat : acc[0][1]
+                    acc[1][0] = lng > acc[1][0] ? lng : acc[1][0]
+                    acc[1][1] = lng < acc[1][1] ? lng : acc[1][1]
+                    return acc
+                }, startVal)
+                const minLng = Math.floor(minmaxLatlng[1][0])
+                const maxLng = Math.floor(minmaxLatlng[1][1])
+                const minLat = Math.floor(minmaxLatlng[0][0])
+                const maxLat = Math.floor(minmaxLatlng[0][1])
+                const tiles = []
+                for (let lng = minLng; lng <= maxLng; lng++) {
+                    for (let lat = minLat; lat <= maxLat; lat++) {
+                        tiles.push(`${lat}-${lng}`)
+                    }
+                }
+                cityObj.tiles = tiles
+                delete cityObj.sensorLocations
+                cityList.set(key, cityObj)
+            })
+            const cities = cityList.values()
             const cityListJSON = {
                 name: 'ensorlocationIds per city',
                 description: 'List of sensorlocation id\'s per city',
@@ -286,17 +337,18 @@ class Luftdaten {
                 author: 'Toon Nelissen',
                 // documentation: 'https://documentation.influencair.be',
                 timestamp: (new Date()).toJSON(),
-                data: cityList
+                data: [...cities]
             }
             try {
                 fs.outputJson(path.join(staticDirectoryPath, 'cityList.json'), cityListJSON, (err) => {
                     if (err) throw err
                     console.log('The file cityList.json, has been saved!')
+                    resolve()
                 })
             } catch (error) {
                 reject(error)
             }
-            resolve()
+            
         })
     }
     createSensorsPerCountry () {
@@ -390,6 +442,19 @@ class Luftdaten {
             }
             this.updatingCityData = false
             resolve()
+        })
+    }
+    updateSensorLocationsData () {
+        return new Promise((resolve, reject) => {
+            const sensorLocationsPath = path.join(storageDirectoryPath, 'sensorLocations.json')
+            try {
+                fs.outputJson(sensorLocationsPath, [...this.sensorLocations], (err) => {
+                    if (err) throw err
+                    console.log('The file sensorLocations.json, has been saved! With ' + this.cityForLocation.size + 'records')
+                })
+            } catch (error) {
+                reject(error)
+            }
         })
     }
     calculateRankings () {
