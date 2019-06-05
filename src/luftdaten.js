@@ -52,8 +52,6 @@ class Luftdaten {
 
         const cityForLocationPath = path.join(storageDirectoryPath, 'cityForLocation.json')
         const sensorLocationsPath = path.join(storageDirectoryPath, 'sensorLocations.json')
-
-
         try {
             fs.ensureFile(cityForLocationPath, err => {
                 if (err) throw err
@@ -251,7 +249,7 @@ class Luftdaten {
                         source: 'http://api.luftdaten.info/static/v2/data.json',
                         origin: `https://data.influencair.be/now/${key}/data.json`,
                         author: 'Toon Nelissen',
-                        // documentation: 'https://documentation.influencair.be',
+                        documentation: 'https://docs.influencair.be/docs/doc_api_data',
                         timestamp: (new Date()).toJSON(),
                         data: dataPerCountry[key]
                     }
@@ -272,7 +270,7 @@ class Luftdaten {
                 source: 'http://api.luftdaten.info/static/v2/data.json',
                 origin: `https://data.influencair.be/now/data.json`,
                 author: 'Toon Nelissen',
-                // documentation: 'https://documentation.influencair.be',
+                documentation: 'https://docs.influencair.be/docs/doc_api_data',
                 timestamp: (new Date()).toJSON(),
                 data: this.data
             }
@@ -335,7 +333,7 @@ class Luftdaten {
                 source: 'http://api.luftdaten.info/static/v2/data.json',
                 origin: 'https://data.influencair.be/cityList.json',
                 author: 'Toon Nelissen',
-                // documentation: 'https://documentation.influencair.be',
+                documentation: 'https://docs.influencair.be/docs/doc_api_data',
                 timestamp: (new Date()).toJSON(),
                 data: [...cities]
             }
@@ -348,7 +346,6 @@ class Luftdaten {
             } catch (error) {
                 reject(error)
             }
-            
         })
     }
     createSensorsPerCountry () {
@@ -366,7 +363,7 @@ class Luftdaten {
                 source: 'http://api.luftdaten.info/static/v2/data.json',
                 origin: 'https://data.influencair.be/countryList.json',
                 author: 'Toon Nelissen',
-                // documentation: 'https://documentation.influencair.be',
+                documentation: 'https://docs.influencair.be/docs/doc_api_data',
                 timestamp: (new Date()).toJSON(),
                 data: countryList
             }
@@ -511,7 +508,7 @@ class Luftdaten {
             source: 'http://api.luftdaten.info/static/v2/data.json',
             origin: 'https://data.influencair.be/ranking/cityRanking.json',
             author: 'Toon Nelissen',
-            // documentation: 'https://documentation.influencair.be',
+            documentation: 'https://docs.influencair.be/docs/doc_api_data',
             timestamp: (new Date()).toJSON(),
             data: citiesArray
         }
@@ -527,7 +524,7 @@ class Luftdaten {
             source: 'http://api.luftdaten.info/static/v2/data.json',
             origin: 'https://data.influencair.be/ranking/countryRanking.json',
             author: 'Toon Nelissen',
-            // documentation: 'https://documentation.influencair.be',
+            documentation: 'https://docs.influencair.be/docs/doc_api_data',
             timestamp: (new Date()).toJSON(),
             data: countriesArray
         }
@@ -543,7 +540,7 @@ class Luftdaten {
             source: 'http://api.luftdaten.info/static/v2/data.json',
             origin: 'https://data.influencair.be/ranking/worldRanking.json',
             author: 'Toon Nelissen',
-            // documentation: 'https://documentation.influencair.be',
+            documentation: 'https://docs.influencair.be/docs/doc_api_data',
             timestamp: (new Date()).toJSON(),
             data: worldArray
         }
