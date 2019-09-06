@@ -14,11 +14,11 @@ app.get('/badge/amount/city/:cityname', sanitizeRequest({ params: true, query: t
 app.get('/badge/amount/country/:countryname', sanitizeRequest({ params: true, query: true }), require('./countryAmountBadge'))
 
 app.use(serveStatic(path.join(__dirname, '..', 'static'), {
-    index: false
+  index: false
 }))
 
 app.use(serveIndex(path.join(__dirname, '..', 'static'), {
-    icons: true
+  icons: true
 }))
 
 app.listen(port, () => console.log(`Listening on port ${port}!`))

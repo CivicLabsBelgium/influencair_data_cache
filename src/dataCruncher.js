@@ -22,56 +22,57 @@ const luftdaten = new Luftdaten()
 // StEP 3 Save data
 
 module.exports = () => {
-    setInterval(() => getData(), 1000 * 60)
-    getData()
+  setInterval(() => getData(), 1000 * 60)
+  getData()
 }
 
 const getList = [
-    {
-        getData: luftdaten.getCurrentData,
-        interval: 1000 * 60,
-        lastRun: Date.now() - 1000 * 60,
-        transFormer: luftdaten.parseCurrentData,
-        dataSaver: [
-            luftdaten.createStaticJsonFiles,
-            luftdaten.updateCityData,
-            luftdaten.calculateRankings,
-            luftdaten.createSensorsPerCity,
-            luftdaten.createSensorsPerCountry
-        ]
-    },
-    {
-        getData: luftdaten.getMeans,
-        interval: 1000 * 60 * 30,
-        lastRun: Date.now() - 1000 * 60 * 30,
-        transFormer: luftdaten.parseCurrentData,
-        dataSaver: luftdaten.createStaticJsonFiles
-    },
-    {
-        getData: irceline.getData,
-        interval: 1000 * 60 * 5,
-        lastRun: Date.now() - 1000 * 60 * 5
-    }
+  {
+    getData: luftdaten.getCurrentData,
+    interval: 1000 * 60,
+    lastRun: Date.now() - 1000 * 60,
+    transFormer: luftdaten.parseCurrentData,
+    dataSaver: [
+      luftdaten.createStaticJsonFiles,
+      luftdaten.updateCityData,
+      luftdaten.updateLocations,
+      luftdaten.calculateRankings,
+      luftdaten.createSensorsPerCity,
+      luftdaten.createSensorsPerCountry
+    ]
+  },
+  {
+    getData: luftdaten.getMeans,
+    interval: 1000 * 60 * 30,
+    lastRun: Date.now() - 1000 * 60 * 30,
+    transFormer: luftdaten.parseCurrentData,
+    dataSaver: luftdaten.createStaticJsonFiles
+  },
+  {
+    getData: irceline.getData,
+    interval: 1000 * 60 * 5,
+    lastRun: Date.now() - 1000 * 60 * 5
+  }
 ]
 
 const getData = () => {
-    getList.forEach(async (dataGetter, i) => {
-        try {
-            if (dataGetter.lastRun + dataGetter.interval < Date.now()) {
-                await dataGetter.getData()
-                if (dataGetter.transFormer) await dataGetter.transFormer()
-                if (dataGetter.dataSaver) {
-                    if (typeof dataGetter.dataSaver === 'function') await dataGetter.dataSaver
-                    if (Array.isArray(dataGetter.dataSaver)) {
-                        dataGetter.dataSaver.forEach(async dataSaver => {
-                            await dataSaver()
-                        })
-                    }
-                }
-                getList[i].lastRun = Date.now()
-            }
-        } catch (error) {
-            console.error(error)
+  getList.forEach(async (dataGetter, i) => {
+    try {
+      if (dataGetter.lastRun + dataGetter.interval < Date.now()) {
+        await dataGetter.getData()
+        if (dataGetter.transFormer) await dataGetter.transFormer()
+        if (dataGetter.dataSaver) {
+          if (typeof dataGetter.dataSaver === 'function') await dataGetter.dataSaver
+          if (Array.isArray(dataGetter.dataSaver)) {
+            dataGetter.dataSaver.forEach(async dataSaver => {
+              await dataSaver()
+            })
+          }
         }
-    })
+        getList[i].lastRun = Date.now()
+      }
+    } catch (error) {
+      console.error(error)
+    }
+  })
 }

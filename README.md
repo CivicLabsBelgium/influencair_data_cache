@@ -1,4 +1,9 @@
 # influencair_data_cache
+
+<a href="https://standardjs.com">
+  <img src="https://img.shields.io/badge/code_style-standard-brightgreen.svg" alt="Standard - JavaScript Style Guide">
+</a>
+
 caching airquality data in a more consumable way for maps and data analysis
 
 ## Current (5min) senor data per country
