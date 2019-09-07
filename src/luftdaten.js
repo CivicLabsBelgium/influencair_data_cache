@@ -222,6 +222,20 @@ class Luftdaten {
             break
         }
       }
+
+      let sensorHourly = this.hourlyMap.get(currentSensor.id)
+      let sensorDaily = this.dailyMap.get(currentSensor.id)
+      if (sensorHourly) {
+        currentSensor.hourly = updateSensorWithMeanValues(sensorHourly)
+      }
+      if (sensorDaily) {
+        currentSensor.daily = updateSensorWithMeanValues(sensorDaily)
+      }
+
+      parsedSensorLocation.sensors.push(currentSensor)
+
+      if (isValid && isNew) sensorLocations.push(parsedSensorLocation)
+
       if (isValid && isNew) sensorLocations.push(parsedSensorLocation)
 
       const sloc = { ...parsedSensorLocation }
@@ -289,7 +303,7 @@ class Luftdaten {
     const sensorLocations = [...this.sensorLocations]
     return new Promise((resolve, reject) => {
       for (const sensorLocation of sensorLocations) {
-        const location = sensorLocation[1]
+        const location = sensorLocation
         const city = cityList.get(location.city) || {
           name: location.city,
           tiles: [],
@@ -409,7 +423,7 @@ class Luftdaten {
                   sensors
                 })
               } else {
-                console.log(response, sensorLocation)
+                console.log('No response from geocoder', response, sensorLocation)
                 if (response.status && response.status.value === 19) fetchCounter = fetchLimit
               }
               fetchCounter++
@@ -516,22 +530,22 @@ class Luftdaten {
 
     const citiesArray = []
     const countriesArray = []
-    const cityForLocation = [...this.cityForLocation]
+    const cityForLocation = [...this.cityForLocation.values()]
 
     const cityRanking = cityForLocation.reduce((acc, location) => {
       // old array type check
-      if (typeof location[1] === 'string') return acc
+      if (typeof location === 'string') return acc
 
       // only count the sensors seen the last day
-      if (!location[1].lastSeenDate || (location[1].lastSeenDate && location[1].lastSeenDate < aDayAgo)) return acc
+      if (!location.lastSeenDate || (location.lastSeenDate && Date.parse(location.lastSeenDate) < aDayAgo)) return acc
 
-      const country = acc[location[1].country] || { name: location[1].country, amount: 0, cities: {} }
-      const city = country.cities[location[1].city] || { name: location[1].city, amount: 0, lat: location[1].lat, lng: location[1].lng }
+      const country = acc[location.country] || { name: location.country, amount: 0, cities: {} }
+      const city = country.cities[location.city] || { name: location.city, amount: 0, lat: location.lat, lng: location.lng }
 
       country.amount = country.amount + 1
       city.amount = city.amount + 1
-      country.cities[location[1].city] = city
-      acc[location[1].country] = country
+      country.cities[location.city] = city
+      acc[location.country] = country
       return acc
     }, {})
 
@@ -569,7 +583,7 @@ class Luftdaten {
       data: citiesArray
     }
 
-    fs.outputJson(path.join(staticRankingDirectoryPath, 'cityRanking.json'), cityRankingJSON, { spaces: 4 }, (err) => {
+    fs.outputJson(path.join(staticRankingDirectoryPath, 'cityRanking.json'), cityRankingJSON, { spaces: 2 }, (err) => {
       if (err) throw err
       console.log('The file cityRanking.json, has been saved!')
     })
@@ -585,7 +599,7 @@ class Luftdaten {
       data: countriesArray
     }
 
-    fs.outputJson(path.join(staticRankingDirectoryPath, 'countryRanking.json'), countryRankingJSON, { spaces: 4 }, (err) => {
+    fs.outputJson(path.join(staticRankingDirectoryPath, 'countryRanking.json'), countryRankingJSON, { spaces: 2 }, (err) => {
       if (err) throw err
       console.log('The file countryRanking.json, has been saved!')
     })
@@ -601,7 +615,7 @@ class Luftdaten {
       data: worldArray
     }
 
-    fs.outputJson(path.join(staticRankingDirectoryPath, 'worldRanking.json'), worldRankingJSON, { spaces: 4 }, (err) => {
+    fs.outputJson(path.join(staticRankingDirectoryPath, 'worldRanking.json'), worldRankingJSON, { spaces: 2 }, (err) => {
       if (err) throw err
       console.log('The file worldRanking.json, has been saved!')
     })

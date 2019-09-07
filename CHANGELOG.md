@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.2] - 2019-09-07
+
+### Changed
+
+- Refactoring of the ranking function
+
+### Fixed
+
+- mistake on badges only showing last seen sensors
+- added sensor propagation back
+
 ## [1.0.1] - 2019-09-06
 
 ### Added

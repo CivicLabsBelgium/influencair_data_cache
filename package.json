@@ -1,6 +1,6 @@
 {
   "name": "irceline_live_cache",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "caching the irceline airquality data in a more consumable way for the influencair map",
   "main": "src/index.js",
   "scripts": {
