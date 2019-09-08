@@ -284,7 +284,7 @@ class Luftdaten {
         source: 'http://api.luftdaten.info/static/v2/data.json',
         origin: `https://data.influencair.be/now/data.json`,
         author: 'Toon Nelissen',
-        // documentation: 'https://documentation.influencair.be',
+        documentation: 'https://docs.influencair.be',
         timestamp: (new Date()).toJSON(),
         data: this.data
       }
@@ -342,7 +342,7 @@ class Luftdaten {
       })
       const cities = cityList.values()
       const cityListJSON = {
-        name: 'ensorlocationIds per city',
+        name: 'sensorlocationIds per city',
         description: 'List of sensorlocation id\'s per city',
         source: 'http://api.luftdaten.info/static/v2/data.json',
         origin: 'https://data.influencair.be/cityList.json',
@@ -377,7 +377,7 @@ class Luftdaten {
         source: 'http://api.luftdaten.info/static/v2/data.json',
         origin: 'https://data.influencair.be/countryList.json',
         author: 'Toon Nelissen',
-        // documentation: 'https://documentation.influencair.be',
+        documentation: 'https://docs.influencair.be',
         timestamp: (new Date()).toJSON(),
         data: countryList
       }
@@ -530,22 +530,24 @@ class Luftdaten {
 
     const citiesArray = []
     const countriesArray = []
-    const cityForLocation = [...this.cityForLocation.values()]
+    const locations = [...this.locations.values()]
 
-    const cityRanking = cityForLocation.reduce((acc, location) => {
-      // old array type check
-      if (typeof location === 'string') return acc
-
+    const cityRanking = locations.reduce((acc, { lastSeenDate, location }) => {
       // only count the sensors seen the last day
-      if (!location.lastSeenDate || (location.lastSeenDate && Date.parse(location.lastSeenDate) < aDayAgo)) return acc
+      if (!lastSeenDate || (lastSeenDate && Date.parse(lastSeenDate) < aDayAgo)) return acc
 
-      const country = acc[location.country] || { name: location.country, amount: 0, cities: {} }
-      const city = country.cities[location.city] || { name: location.city, amount: 0, lat: location.lat, lng: location.lng }
+      const country = acc[location.address.country] || { name: location.address.country, amount: 0, cities: {} }
+      const cityName = location.address.city || location.address.town || location.address.village || location.address.county || location.address.suburb || location.address.hamlet
+      if (!cityName) {
+        console.log('no cityName', location)
+        return acc
+      }
+      const city = country.cities[cityName] || { name: cityName, amount: 0, lat: location.lat, lng: location.lng }
 
       country.amount = country.amount + 1
       city.amount = city.amount + 1
-      country.cities[location.city] = city
-      acc[location.country] = country
+      country.cities[cityName] = city
+      acc[location.address.country] = country
       return acc
     }, {})
 
@@ -578,7 +580,7 @@ class Luftdaten {
       source: 'http://api.luftdaten.info/static/v2/data.json',
       origin: 'https://data.influencair.be/ranking/cityRanking.json',
       author: 'Toon Nelissen',
-      // documentation: 'https://documentation.influencair.be',
+      documentation: 'https://docs.influencair.be',
       timestamp: (new Date()).toJSON(),
       data: citiesArray
     }
@@ -594,7 +596,7 @@ class Luftdaten {
       source: 'http://api.luftdaten.info/static/v2/data.json',
       origin: 'https://data.influencair.be/ranking/countryRanking.json',
       author: 'Toon Nelissen',
-      // documentation: 'https://documentation.influencair.be',
+      documentation: 'https://docs.influencair.be',
       timestamp: (new Date()).toJSON(),
       data: countriesArray
     }
@@ -610,7 +612,7 @@ class Luftdaten {
       source: 'http://api.luftdaten.info/static/v2/data.json',
       origin: 'https://data.influencair.be/ranking/worldRanking.json',
       author: 'Toon Nelissen',
-      // documentation: 'https://documentation.influencair.be',
+      documentation: 'https://docs.influencair.be',
       timestamp: (new Date()).toJSON(),
       data: worldArray
     }
