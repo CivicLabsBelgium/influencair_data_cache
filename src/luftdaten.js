@@ -542,14 +542,17 @@ class Luftdaten {
       if (!lastSeenDate || (lastSeenDate && Date.parse(lastSeenDate) < aDayAgo)) return acc
       const countryName = location.address.country
 
-      const country = acc[countryName] || { name: countryName, amount: 0, cities: {} }
+      const country = acc[countryName] || { name: countryName, amount: 0, cities: [] }
       for (const loc in location.address) {
         if (location.address.hasOwnProperty(loc)) {
           if (addressProperties.includes(loc)) {
             const locName = nameCorrection[location.address[loc]] || location.address[loc]
-            const city = country.cities[locName] || { name: locName, amount: 0, type: loc }
-            city.amount = city.amount + 1
-            country.cities[locName] = city
+            const locIndex = country.cities.findIndex(c => c.name === locName && c.type === loc)
+            if (locIndex > -1) {
+              country.cities[locIndex].amount = country.cities[locIndex].amount + 1
+            } else {
+              country.cities.push({ name: locName, amount: 1, type: loc, country: countryName })
+            }
           }
         }
       }
@@ -560,11 +563,7 @@ class Luftdaten {
 
     for (const countryName in cityRanking) {
       const country = cityRanking[countryName]
-      for (const cityName in country.cities) {
-        const city = country.cities[cityName]
-        city.country = countryName
-        citiesArray.push(city)
-      }
+      citiesArray.push(...country.cities)
       delete country.cities
       countriesArray.push(country)
     }
