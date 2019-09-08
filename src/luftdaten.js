@@ -531,23 +531,30 @@ class Luftdaten {
     const citiesArray = []
     const countriesArray = []
     const locations = [...this.locations.values()]
+    const addressProperties = ['ciyt', 'town', 'village', 'county', 'suburb', 'hamlet']
+    const nameCorrection = {
+      'Sofia City': 'Sofia',
+      'Brussels-Capital': 'Brussels'
+    }
 
     const cityRanking = locations.reduce((acc, { lastSeenDate, location }) => {
       // only count the sensors seen the last day
       if (!lastSeenDate || (lastSeenDate && Date.parse(lastSeenDate) < aDayAgo)) return acc
+      const countryName = location.address.country
 
-      const country = acc[location.address.country] || { name: location.address.country, amount: 0, cities: {} }
-      const cityName = location.address.city || location.address.town || location.address.village || location.address.county || location.address.suburb || location.address.hamlet
-      if (!cityName) {
-        console.log('no cityName', location)
-        return acc
+      const country = acc[countryName] || { name: countryName, amount: 0, cities: {} }
+      for (const loc in location.address) {
+        if (location.address.hasOwnProperty(loc)) {
+          if (addressProperties.includes(loc)) {
+            const locName = nameCorrection[location.address[loc]] || location.address[loc]
+            const city = country.cities[locName] || { name: locName, amount: 0, type: loc }
+            city.amount = city.amount + 1
+            country.cities[locName] = city
+          }
+        }
       }
-      const city = country.cities[cityName] || { name: cityName, amount: 0, lat: location.lat, lng: location.lng }
-
       country.amount = country.amount + 1
-      city.amount = city.amount + 1
-      country.cities[cityName] = city
-      acc[location.address.country] = country
+      acc[countryName] = country
       return acc
     }, {})
 
@@ -556,8 +563,6 @@ class Luftdaten {
       for (const cityName in country.cities) {
         const city = country.cities[cityName]
         city.country = countryName
-        delete city.lat
-        delete city.lng
         citiesArray.push(city)
       }
       delete country.cities

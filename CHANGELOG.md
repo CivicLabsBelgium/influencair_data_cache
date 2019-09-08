@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Updated methode of cityRanking to the OSM nominatim data
+- Added ranking for each type of place (city, village, county, town, ...)
 
 ## [1.0.2] - 2019-09-07
 
