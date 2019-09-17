@@ -541,7 +541,7 @@ class Luftdaten {
       // only count the sensors seen the last day
       if (!lastSeenDate || (lastSeenDate && Date.parse(lastSeenDate) < aDayAgo)) return acc
       const countryName = location.address ? location.address.country : undefined
-      if (countryName) return acc
+      if (countryName === undefined) return acc
 
       const country = acc[countryName] || { name: countryName, amount: 0, cities: [] }
       for (const loc in location.address) {
