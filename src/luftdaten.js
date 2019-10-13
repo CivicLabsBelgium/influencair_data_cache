@@ -303,7 +303,7 @@ class Luftdaten {
     const sensorLocations = [...this.sensorLocations]
     return new Promise((resolve, reject) => {
       for (const sensorLocation of sensorLocations) {
-        const location = sensorLocation
+        const location = sensorLocation[1]
         const city = cityList.get(location.city) || {
           name: location.city,
           tiles: [],
