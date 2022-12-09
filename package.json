@@ -23,7 +23,7 @@
   },
   "homepage": "https://github.com/CivicLabsBelgium/irceline_live_cache#readme",
   "dependencies": {
-    "express": "^4.16.4",
+    "express": "^4.17.3",
     "express-sanitize-middleware": "^1.0.3",
     "fs-extra": "^7.0.1",
     "geocoder-geonames": "^0.1.2",
